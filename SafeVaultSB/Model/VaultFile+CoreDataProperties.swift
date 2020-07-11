@@ -2,7 +2,7 @@
 //  VaultFile+CoreDataProperties.swift
 //  
 //
-//  Created by Tiago Lima on 06/07/2020.
+//  Created by Tiago Lima on 11/07/2020.
 //
 //
 
@@ -22,5 +22,7 @@ extension VaultFile {
     @NSManaged public var name: String?
     @NSManaged public var path: URL?
     @NSManaged public var size: Int64
+    @NSManaged public var iv: String?
+    @NSManaged public var isInSync: Bool
 
 }

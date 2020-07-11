@@ -37,7 +37,6 @@ class CustomCell: UITableViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
       
-        //setCellShadow(cell: ShadowContainer)
         self.setStyle()
         
         if let fileName = fileName {
@@ -51,6 +50,26 @@ class CustomCell: UITableViewCell {
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+    }
+    
+    func reset() {
+        self.FileProgressView.isHidden = true
+        self.FileProgressView.setProgress(0, animated: false)
+        self.TaskNameView.text = ""
+        self.isWorking = false
+    }
+    
+    func setTaskName(task: TaskName) {
+        switch task {
+        case TaskName.Encrypt:
+            self.TaskNameView.text = "Encrypting"
+        case TaskName.Decrypt:
+            self.TaskNameView.text = "Decrypting"
+        case TaskName.Download:
+            self.TaskNameView.text = "Downloading"
+        case TaskName.Upload:
+            self.TaskNameView.text = "Uploading"
+        }
     }
     
     private func setStyle() {

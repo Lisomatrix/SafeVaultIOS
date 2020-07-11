@@ -40,15 +40,12 @@ extension MyFilesViewController: UIDocumentPickerDelegate {
         // Check if selected URL is a folder
         let isDirectory = (try? selected.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory ?? false
 
-        // This code is CPU intensive and blocking
-        // So I don't want it in UI Thread
-        DispatchQueue.global(qos: .background).async {
-            // Handle it accordingly
-            if !isDirectory {
-                self.handleFileSelected(selectedFile: selected)
-            } else {
-                self.handleFolderSelected(selectedFolder: selected)
-            }
+       
+        // Handle it accordingly
+        if !isDirectory {
+            self.handleFileSelected(selectedFile: selected)
+        } else {
+            self.handleFolderSelected(selectedFolder: selected)
         }
     }
     
@@ -77,16 +74,18 @@ extension MyFilesViewController: UIDocumentPickerDelegate {
         self.tasks[wrapper.file!.id!] = wrapper
         
         // Reload the table so it will track the progress
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
+        self.tableView.reloadData()
+        
+        DispatchQueue.global(qos: .background).async {
+            self.cryptoHelper.decryptFile(inputUri: vaultFile.path!, outputUri: newFile, key: vaultFile.key!, wrapper: wrapper)
         }
         
-        self.cryptoHelper.decryptFile(inputUri: vaultFile.path!, outputUri: newFile, key: vaultFile.key!, wrapper: wrapper)
     }
     
     private func handleFileSelected(selectedFile: URL) {
-        let vaultFile = self.vaultFileRepository.createVaultFileInstanceUniserted()
-            
+        
+        let vaultFile = self.vaultFileRepository.createVaultFileInstance()
+        
         vaultFile.name = selectedFile.lastPathComponent
         vaultFile.fileExtension = selectedFile.pathExtension
             
@@ -116,20 +115,46 @@ extension MyFilesViewController: UIDocumentPickerDelegate {
         // Add to tasks list
         self.tasks[wrapper.file!.id!] = wrapper
         
+        self.vaultFileRepository.saveVaultFile(vaultFile: vaultFile)
         
-        // Not sure if I rly need to do this
-        // But atleast I avoid concurrency problems
-        DispatchQueue.main.async {
-            self.vaultFileRepository.saveVaultFile(vaultFile: vaultFile)
-        }
-       
-        self.cryptoHelper.encryptFile(inputUri: selectedFile, outputUri: fileURL, key: vaultFile.key!, wrapper: wrapper)
+        let isAuthenticated = self.networkAuthHandler.isAuthenticated
         
-        // Delete selected file
-        do {
-            try FileManager.default.removeItem(at: selectedFile)
-        } catch {
-            print("Error: \(error)")
+        DispatchQueue.global(qos: .background).async {
+            let iv = self.cryptoHelper.encryptFile(inputUri: selectedFile, outputUri: fileURL, key: vaultFile.key!, wrapper: wrapper)
+            
+            // pass iv to base64, its fine is its just a few bytes
+            let base64Data = iv.base64EncodedData(options: .endLineWithLineFeed)
+            let base64String = String(data: base64Data, encoding: .utf8)!
+            
+            vaultFile.iv = base64String
+            vaultFile.isInSync = false
+            
+            DispatchQueue.main.async {
+                if isAuthenticated {
+                    vaultFile.isInSync = true
+                    wrapper.file = vaultFile
+                    wrapper.obs = MutableObservable<Float>(0)
+                    wrapper.task = TaskName.Upload
+                    
+                    // Add to tasks list
+                    self.tasks[wrapper.file!.id!] = wrapper
+                    self.vaultFileRepository.saveVaultFile(vaultFile: vaultFile)
+                    self.networkFileHandler.requestFileUpload(vaultFile: vaultFile, fileURL: vaultFile.path!, wrapper: wrapper)
+                    
+                }
+                
+                
+            }
+            
+            // Delete selected file
+            do {
+                
+                try FileManager.default.removeItem(at: selectedFile)
+            } catch {
+                print("Error: \(error)")
+            }
         }
+        
+        
     }
 }

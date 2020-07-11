@@ -203,6 +203,12 @@
                                     <action selector="haveAccountBtnPressed:" destination="iQy-qQ-Qpo" eventType="touchUpInside" id="PKm-dB-RYg"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4YL-rR-hEc">
+                                <rect key="frame" x="40" y="387" width="240" height="0.0"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
+                                <color key="textColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" red="0.0" green="0.67818123100000005" blue="0.88338482380000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
@@ -212,10 +218,13 @@
                             <constraint firstItem="JsB-mQ-Alq" firstAttribute="centerX" secondItem="9Rp-xI-xYD" secondAttribute="centerX" id="6rc-4A-Urc"/>
                             <constraint firstItem="P5g-va-hzl" firstAttribute="trailing" secondItem="y5j-QN-pGo" secondAttribute="trailing" constant="60" id="9iX-lx-97b"/>
                             <constraint firstItem="4kE-nt-HNf" firstAttribute="centerX" secondItem="9Rp-xI-xYD" secondAttribute="centerX" id="Hvw-fx-pnx"/>
+                            <constraint firstItem="4YL-rR-hEc" firstAttribute="top" secondItem="eM0-K9-tkt" secondAttribute="bottom" constant="15" id="LNv-ZJ-SvC"/>
                             <constraint firstItem="eM0-K9-tkt" firstAttribute="leading" secondItem="P5g-va-hzl" secondAttribute="leading" constant="40" id="MnE-cq-1uI"/>
                             <constraint firstItem="y5j-QN-pGo" firstAttribute="top" secondItem="eM0-K9-tkt" secondAttribute="bottom" constant="60" id="QQd-gQ-vJK"/>
                             <constraint firstItem="uTb-9f-Kl8" firstAttribute="leading" secondItem="P5g-va-hzl" secondAttribute="leading" constant="40" id="TfR-mD-HBN"/>
+                            <constraint firstAttribute="trailing" secondItem="4YL-rR-hEc" secondAttribute="trailing" constant="40" id="Xae-Du-4ee"/>
                             <constraint firstItem="uTb-9f-Kl8" firstAttribute="top" secondItem="4kE-nt-HNf" secondAttribute="bottom" constant="50" id="e71-V5-FPh"/>
+                            <constraint firstItem="4YL-rR-hEc" firstAttribute="leading" secondItem="9Rp-xI-xYD" secondAttribute="leading" constant="40" id="l9g-MH-YiB"/>
                             <constraint firstItem="y5j-QN-pGo" firstAttribute="leading" secondItem="P5g-va-hzl" secondAttribute="leading" constant="60" id="pfS-oI-hvp"/>
                             <constraint firstItem="P5g-va-hzl" firstAttribute="trailing" secondItem="eM0-K9-tkt" secondAttribute="trailing" constant="40" id="uI1-of-U8N"/>
                             <constraint firstItem="eM0-K9-tkt" firstAttribute="top" secondItem="uTb-9f-Kl8" secondAttribute="bottom" constant="40" id="xOk-ZJ-YBG"/>
@@ -223,6 +232,7 @@
                         <viewLayoutGuide key="safeArea" id="P5g-va-hzl"/>
                     </view>
                     <connections>
+                        <outlet property="errorLabel" destination="4YL-rR-hEc" id="Rvo-88-166"/>
                         <outlet property="haveAccountBtn" destination="JsB-mQ-Alq" id="Rjd-ce-dLd"/>
                         <outlet property="logoImage" destination="4kE-nt-HNf" id="sO8-Qq-5Hw"/>
                         <outlet property="passwordTextField" destination="fKc-aE-T5w" id="7eq-XS-OW6"/>

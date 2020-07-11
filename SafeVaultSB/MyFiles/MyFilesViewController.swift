@@ -11,7 +11,6 @@ import UIKit
 import MobileCoreServices
 import CoreData
 import CommonCrypto
-import RNCryptor
 
 extension MyFilesViewController: UISearchControllerDelegate, UISearchResultsUpdating, UISearchBarDelegate {
     
@@ -71,12 +70,28 @@ extension MyFilesViewController: UISearchControllerDelegate, UISearchResultsUpda
         self.vaultFileRepository = appDelegate.vaultFileRepository
         self.cryptoHelper = appDelegate.cryptoHelper
         
-        initializeSearchController()
+        self.networkStatusHelper.delegate = self
+        self.biometricsHelper.alertHelper = self.alertHelper
+        self.networkAuthHandler.delegate = self
+        self.networkFileHandler.delegate = self
+        
+        self.networkStatusHelper.initializeNetworkMonitor()
+        self.initializeSearchController()
+        
+        self.syncData()
         
         // Remove separators
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
         
         self.fetchedResultsController = vaultFileRepository.getFetchedResultsController(tableController: self)
+    }
+    
+    private func syncData() {
+        let isSyncNeeded = UserDefaults.standard.value(forKey: "syncNeeded") as? Bool ?? false
+        
+        if isSyncNeeded {
+            self.networkFileHandler.getFileData()
+        }
     }
     
     @IBAction func onAddPressed(_ sender: UIBarButtonItem) {
@@ -95,25 +110,34 @@ extension MyFilesViewController: UISearchControllerDelegate, UISearchResultsUpda
         
         if indexPaths == nil {return}
         
+        var files: [VaultFile] = []
+        
+        for indexPath in indexPaths! {
+            let file = self.fetchedResultsController?.object(at: indexPath)
+            
+            if file == nil {continue}
+            
+            files.append(file!)
+        }
+        
         self.tableView.setEditing(false, animated: true)
         
-        DispatchQueue.global(qos: .background).async {
-            let fileManager = FileManager()
+        
+        let fileManager = FileManager()
             
-            for indexPath in indexPaths! {
-                guard let file = self.fetchedResultsController?.object(at: indexPath) else {
-                    continue
-                }
-                
+        for file in files {
+            DispatchQueue.global(qos: .background).async {
                 do {
                     try fileManager.removeItem(at: file.path!)
                 } catch {
                     print("Error: \(error)")
                 }
-                
-                self.vaultFileRepository.removeFile(vaultFile: file)
             }
+                
+            self.vaultFileRepository.removeFile(vaultFile: file)
+                
         }
+        
     }
     
 }

@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:RNCryptor-master/RNCryptor.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:SafeVaultSB/model/VaultFile+CoreDataClass.swift">
    </FileRef>
    <FileRef

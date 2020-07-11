@@ -13,6 +13,8 @@ import CoreData
 enum TaskName {
     case Encrypt
     case Decrypt
+    case Download
+    case Upload
 }
 
 struct VaultFileWrapper {

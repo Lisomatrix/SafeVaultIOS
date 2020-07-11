@@ -38,6 +38,9 @@ class MyFilesViewController: UITableViewController, NSFetchedResultsControllerDe
     let alertHelper = AlertHelper()
     let biometricsHelper = BiometricsHelper()
     
+    let networkAuthHandler = NetworkAuthHandler()
+    let networkStatusHelper = NetworkStatusHelper()
+    let networkFileHandler = NetworkFileHandler()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,15 +48,13 @@ class MyFilesViewController: UITableViewController, NSFetchedResultsControllerDe
         initialize()
         self.alertHelper.delegate = self
         self.biometricsHelper.biometricAuthentication(reason: "Log in into your account")
-        self.biometricsHelper.alertHelper = self.alertHelper
+        
         
         self.navigationItem.rightBarButtonItems?.append(self.editButtonItem)
-        //self.navigationItem.rightBarButtonItem = self.editButtonItem
-        
-        
         
         self.tableView.allowsMultipleSelectionDuringEditing = true
         self.tableView.allowsSelection = true
+        
     }
     
     // Change add btn icon
@@ -153,29 +154,46 @@ class MyFilesViewController: UITableViewController, NSFetchedResultsControllerDe
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MyFileCell", for: indexPath) as! CustomCell
         
-        // Set up the cell
-        guard let file = self.fetchedResultsController?.object(at: indexPath) else {
-            fatalError("Attempt to configure cell without a managed object")
+        var file: VaultFile? = nil
+        
+        if (self.fetchedResultsController?.sections!.count)! > indexPath.section {
+            let section = self.fetchedResultsController.sections![indexPath.section]
+            
+            if section.numberOfObjects > indexPath.row {
+                file = self.fetchedResultsController?.object(at: indexPath)
+            } else {
+                self.tableView.reloadData()
+            }
+        } else {
+            self.tableView.reloadData()
         }
+        
+        // Set up the cell
+        /*guard let file = self.fetchedResultsController?.object(at: indexPath) else {
+            fatalError("Attempt to configure cell without a managed object")
+        }*/
        
         // If previous holding file is not equal then
+        
         // stop the observable and update properties
-        if cell.objectID != file.id {
+        if cell.objectID == nil || cell.objectID != file?.id {
             cell.disposable?.dispose()
-            cell.objectID = file.id
-            cell.FileProgressView.setProgress(0, animated: false)
-            cell.FileProgressView.isHidden = true
-            cell.TaskNameView.text = ""
+            cell.reset()
         }
         
         // This is hacky way to get encryption progress
         // So we have a wrapper that has the file object and a observable
-        let wrapper = getObservable(objectID: file.id!)
+        var wrapper: VaultFileWrapper? = nil
+        
+        if file != nil && file?.id != nil  {
+            wrapper = getObservable(objectID: file!.id!)
+        }
         
         // We check if a task exists
         if wrapper != nil {
             // Set working task name
-            cell.TaskNameView.text = wrapper?.task == TaskName.Encrypt ? "Encrypting" : "Decrypting"
+           
+            cell.setTaskName(task: wrapper!.task!)
             // Flag in order to not allow to be selected to decrypt
             cell.isWorking = true
             
@@ -193,10 +211,7 @@ class MyFilesViewController: UITableViewController, NSFetchedResultsControllerDe
                 // When it reaches 100% hide the progress bar
                 if newValue == 1 {
                     DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
-                        cell.FileProgressView.isHidden = true
-                        cell.FileProgressView.setProgress(0, animated: false)
-                        cell.TaskNameView.text = ""
-                        cell.isWorking = false
+                        cell.reset()
                     }
                     // And cleanup this task
                     self.tasks.removeValue(forKey: wrapper!.file!.id!)
@@ -207,8 +222,8 @@ class MyFilesViewController: UITableViewController, NSFetchedResultsControllerDe
         }
         
         // Update row data
-        cell.fileName = file.name
-        cell.fileSize = formatter.string(fromByteCount: file.size)
+        cell.fileName = file?.name
+        cell.fileSize = formatter.string(fromByteCount: file!.size)
 
         return cell
     }

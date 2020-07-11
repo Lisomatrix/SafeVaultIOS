@@ -10,17 +10,17 @@ import BiometricAuthentication
 import Foundation
 import MobileCoreServices
 import CommonCrypto
-import RNCryptor
 import LocalAuthentication
+import RNCryptor
 
 class CryptoHelper {
     
     // Compare given hash with the one saved in KeyChain
     func checkKeyChainPassword(accountID: String, hashedPassword: String) -> Bool {
         do {
-            let storedPasswordHash = try KeychainPasswordItem(account: accountID).readPassword()
+            let storedPasswordHash = try KeychainPasswordItem(accountID).readPassword()
             
-            return hashedPassword.sha512() == storedPasswordHash
+            return hashedPassword == storedPasswordHash
         } catch {
             return false
         }
@@ -30,16 +30,53 @@ class CryptoHelper {
     func saveOnKeyChain(accountId: String, password: String) {
         do {
             // Hashing is never to much
-            try KeychainPasswordItem(account: accountId).savePassword(password.sha512())
+            try KeychainPasswordItem(accountId).savePassword(password.sha512())
         } catch {
             print("Error on saving password on keychain: ", error)
         }
     }
     
-    func encryptFile(inputUri: URL, outputUri: URL, key: String, wrapper: VaultFileWrapper?) {
+    func saveTokenOnKeyChain(token: String) {
+        do {
+            try KeychainPasswordItem("token").savePassword(token)
+        } catch {
+            print("Error on saving token on keychain: ", error)
+        }
+    }
+    
+    func getTokenOnKeyChain() -> String? {
+        do {
+            return try KeychainPasswordItem("token").readPassword()
+        } catch {
+            print("Error on getting token from keychain: ", error)
+            return nil
+        }
+    }
+    
+    func savePermanentTokenOnKeyChain(token: String) {
+        do {
+            try KeychainPasswordItem("permanentToken").savePassword(token)
+        } catch {
+            print("Error on saving token on keychain: ", error)
+        }
+    }
+    
+    func getPermanentTokenOnKeyChain() -> String? {
+        do {
+            return try KeychainPasswordItem("permanentToken").readPassword()
+        } catch {
+            print("Error on getting token from keychain: ", error)
+            return nil
+        }
+    }
+    
+    // Had to fork RNCryptor in order to get IV
+    func encryptFile(inputUri: URL, outputUri: URL, key: String, wrapper: VaultFileWrapper?) -> Data {
         // Initialize encryptor
         // This will generate the IV for us and keep it in the first file bytes
         let encryptor = RNCryptor.Encryptor(password: key)
+        
+        let iv = encryptor.getIV()
         
         // Create buffer
         let bufferSize = 4096
@@ -112,6 +149,8 @@ class CryptoHelper {
         // Close streams
         inputStream.close()
         outputStream.close()
+        
+        return iv
     }
     
     func decryptFile(inputUri: URL, outputUri: URL, key: String, wrapper: VaultFileWrapper?) {

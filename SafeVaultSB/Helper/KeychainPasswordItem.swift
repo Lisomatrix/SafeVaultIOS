@@ -27,7 +27,7 @@ struct KeychainPasswordItem {
     let accessGroup: String?
 
     // MARK: Intialization
-    init(service: String = SERVICE, account: String, accessGroup: String? = nil) {
+    init(service: String = SERVICE, _ account: String, accessGroup: String? = nil) {
         self.service = service
         self.account = account
         self.accessGroup = accessGroup
@@ -160,7 +160,7 @@ struct KeychainPasswordItem {
                 throw KeychainError.unexpectedItemData
             }
 
-            let passwordItem = KeychainPasswordItem(service: service, account: account, accessGroup: accessGroup)
+            let passwordItem = KeychainPasswordItem(service: service, account, accessGroup: accessGroup)
             passwordItems.append(passwordItem)
         }
 

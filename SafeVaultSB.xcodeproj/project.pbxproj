@@ -22,6 +22,11 @@
 		235283CD24AFE3BE00891608 /* NSObjectExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 235283CC24AFE3BE00891608 /* NSObjectExtension.swift */; };
 		235283CF24AFEB8600891608 /* MyFilesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 235283CE24AFEB8600891608 /* MyFilesTableViewController.swift */; };
 		235283D124AFEEDC00891608 /* CustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 235283D024AFEEDC00891608 /* CustomCell.swift */; };
+		2353499E24B8D0470096BFB1 /* FileUploadRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2353499D24B8D0470096BFB1 /* FileUploadRequest.swift */; };
+		235349EA24B915840096BFB1 /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 235349E924B915840096BFB1 /* RNCryptor.framework */; };
+		235349EB24B915840096BFB1 /* RNCryptor.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 235349E924B915840096BFB1 /* RNCryptor.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		235349EE24B9B2E20096BFB1 /* VaultFileSerializable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 235349ED24B9B2E20096BFB1 /* VaultFileSerializable.swift */; };
+		235349F024B9FDEF0096BFB1 /* ClearHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 235349EF24B9FDEF0096BFB1 /* ClearHelper.swift */; };
 		23861F5324B0E82A0033A08B /* CryptoHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23861F5224B0E82A0033A08B /* CryptoHelper.swift */; };
 		23861F5524B0EAF90033A08B /* AlertHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23861F5424B0EAF90033A08B /* AlertHelper.swift */; };
 		23861F6724B0F4B60033A08B /* MyFilesFilePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23861F6624B0F4B60033A08B /* MyFilesFilePicker.swift */; };
@@ -30,6 +35,14 @@
 		23861F6E24B114340033A08B /* VaultFileRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23861F6D24B114340033A08B /* VaultFileRepository.swift */; };
 		23861F7024B124AA0033A08B /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23861F6F24B124AA0033A08B /* StringExtension.swift */; };
 		23962F8224AFC58E00F311DA /* KeychainPasswordItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23962F8124AFC58E00F311DA /* KeychainPasswordItem.swift */; };
+		239AC6B624B89F1F00365EEE /* NetworkAuthHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 239AC6B524B89F1F00365EEE /* NetworkAuthHandler.swift */; };
+		239AC6BA24B8A27700365EEE /* AuthRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 239AC6B924B8A27700365EEE /* AuthRequest.swift */; };
+		239AC6BC24B8A2D700365EEE /* AuthResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 239AC6BB24B8A2D700365EEE /* AuthResponse.swift */; };
+		239AC6BE24B8BA4F00365EEE /* NetworkStatusHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 239AC6BD24B8BA4F00365EEE /* NetworkStatusHelper.swift */; };
+		239AC6C024B8BC9100365EEE /* MyFilesNetworkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 239AC6BF24B8BC9100365EEE /* MyFilesNetworkHandler.swift */; };
+		239AC6C224B8C34B00365EEE /* RegisterResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 239AC6C124B8C34B00365EEE /* RegisterResponse.swift */; };
+		239AC6C424B8C5EA00365EEE /* TokenRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 239AC6C324B8C5EA00365EEE /* TokenRequest.swift */; };
+		239AC6C624B8CFF300365EEE /* NetworkFileHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 239AC6C524B8CFF300365EEE /* NetworkFileHandler.swift */; };
 		23CA0CC324B4825A00219D81 /* IntroViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23CA0CC224B4825A00219D81 /* IntroViewController.swift */; };
 		23CA0CC624B48E1E00219D81 /* WarningTwoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23CA0CC524B48E1E00219D81 /* WarningTwoViewController.swift */; };
 		23CA0CC924B496EF00219D81 /* IntroPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23CA0CC824B496EF00219D81 /* IntroPageViewController.swift */; };
@@ -39,6 +52,20 @@
 		23F16BD724B37ED300E95147 /* BiometricsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23F16BD624B37ED300E95147 /* BiometricsHelper.swift */; };
 		6BE34FC781948E35116862F4 /* Pods_SafeVaultSB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE35F02D549C5BFAF53568AC /* Pods_SafeVaultSB.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		235349EC24B915840096BFB1 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				235349EB24B915840096BFB1 /* RNCryptor.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		230A2D9124AF8B74003448BF /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
@@ -58,6 +85,10 @@
 		235283CC24AFE3BE00891608 /* NSObjectExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSObjectExtension.swift; sourceTree = "<group>"; };
 		235283CE24AFEB8600891608 /* MyFilesTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyFilesTableViewController.swift; sourceTree = "<group>"; };
 		235283D024AFEEDC00891608 /* CustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCell.swift; sourceTree = "<group>"; };
+		2353499D24B8D0470096BFB1 /* FileUploadRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUploadRequest.swift; sourceTree = "<group>"; };
+		235349E924B915840096BFB1 /* RNCryptor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RNCryptor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		235349ED24B9B2E20096BFB1 /* VaultFileSerializable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultFileSerializable.swift; sourceTree = "<group>"; };
+		235349EF24B9FDEF0096BFB1 /* ClearHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearHelper.swift; sourceTree = "<group>"; };
 		23861F5224B0E82A0033A08B /* CryptoHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoHelper.swift; sourceTree = "<group>"; };
 		23861F5424B0EAF90033A08B /* AlertHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertHelper.swift; sourceTree = "<group>"; };
 		23861F6624B0F4B60033A08B /* MyFilesFilePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyFilesFilePicker.swift; sourceTree = "<group>"; };
@@ -66,6 +97,14 @@
 		23861F6D24B114340033A08B /* VaultFileRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultFileRepository.swift; sourceTree = "<group>"; };
 		23861F6F24B124AA0033A08B /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		23962F8124AFC58E00F311DA /* KeychainPasswordItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainPasswordItem.swift; sourceTree = "<group>"; };
+		239AC6B524B89F1F00365EEE /* NetworkAuthHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkAuthHandler.swift; sourceTree = "<group>"; };
+		239AC6B924B8A27700365EEE /* AuthRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthRequest.swift; sourceTree = "<group>"; };
+		239AC6BB24B8A2D700365EEE /* AuthResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthResponse.swift; sourceTree = "<group>"; };
+		239AC6BD24B8BA4F00365EEE /* NetworkStatusHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkStatusHelper.swift; sourceTree = "<group>"; };
+		239AC6BF24B8BC9100365EEE /* MyFilesNetworkHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyFilesNetworkHandler.swift; sourceTree = "<group>"; };
+		239AC6C124B8C34B00365EEE /* RegisterResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterResponse.swift; sourceTree = "<group>"; };
+		239AC6C324B8C5EA00365EEE /* TokenRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRequest.swift; sourceTree = "<group>"; };
+		239AC6C524B8CFF300365EEE /* NetworkFileHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkFileHandler.swift; sourceTree = "<group>"; };
 		23CA0CC224B4825A00219D81 /* IntroViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroViewController.swift; sourceTree = "<group>"; };
 		23CA0CC524B48E1E00219D81 /* WarningTwoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningTwoViewController.swift; sourceTree = "<group>"; };
 		23CA0CC824B496EF00219D81 /* IntroPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroPageViewController.swift; sourceTree = "<group>"; };
@@ -83,6 +122,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				235349EA24B915840096BFB1 /* RNCryptor.framework in Frameworks */,
 				6BE34FC781948E35116862F4 /* Pods_SafeVaultSB.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -94,6 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				2311880824B2687600005507 /* VaultFileWrapper.swift */,
+				235349ED24B9B2E20096BFB1 /* VaultFileSerializable.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -106,6 +147,7 @@
 				23962F8124AFC58E00F311DA /* KeychainPasswordItem.swift */,
 				235283CC24AFE3BE00891608 /* NSObjectExtension.swift */,
 				23861F6F24B124AA0033A08B /* StringExtension.swift */,
+				235349EF24B9FDEF0096BFB1 /* ClearHelper.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -131,6 +173,9 @@
 		2314AB1324AF792B00823415 /* SafeVaultSB */ = {
 			isa = PBXGroup;
 			children = (
+				239AC6B824B8A25800365EEE /* Response */,
+				239AC6B724B8A25200365EEE /* Request */,
+				239AC6B424B89E8300365EEE /* Network */,
 				23181A1224B4A64D00D8D878 /* Account */,
 				23CA0CCE24B498FB00219D81 /* Style */,
 				23861F6A24B112F70033A08B /* Repository */,
@@ -195,6 +240,35 @@
 			path = Repository;
 			sourceTree = "<group>";
 		};
+		239AC6B424B89E8300365EEE /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				239AC6BD24B8BA4F00365EEE /* NetworkStatusHelper.swift */,
+				239AC6B524B89F1F00365EEE /* NetworkAuthHandler.swift */,
+				239AC6C524B8CFF300365EEE /* NetworkFileHandler.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		239AC6B724B8A25200365EEE /* Request */ = {
+			isa = PBXGroup;
+			children = (
+				239AC6B924B8A27700365EEE /* AuthRequest.swift */,
+				239AC6C324B8C5EA00365EEE /* TokenRequest.swift */,
+				2353499D24B8D0470096BFB1 /* FileUploadRequest.swift */,
+			);
+			path = Request;
+			sourceTree = "<group>";
+		};
+		239AC6B824B8A25800365EEE /* Response */ = {
+			isa = PBXGroup;
+			children = (
+				239AC6BB24B8A2D700365EEE /* AuthResponse.swift */,
+				239AC6C124B8C34B00365EEE /* RegisterResponse.swift */,
+			);
+			path = Response;
+			sourceTree = "<group>";
+		};
 		23BCC17F24B0E79C0052DD07 /* Components */ = {
 			isa = PBXGroup;
 			children = (
@@ -209,6 +283,7 @@
 				235283CE24AFEB8600891608 /* MyFilesTableViewController.swift */,
 				23861F6624B0F4B60033A08B /* MyFilesFilePicker.swift */,
 				23861F6824B0F5230033A08B /* MyFilesViewController.swift */,
+				239AC6BF24B8BC9100365EEE /* MyFilesNetworkHandler.swift */,
 			);
 			path = MyFiles;
 			sourceTree = "<group>";
@@ -253,6 +328,7 @@
 		2D2588008F58BA0E1E9333E9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				235349E924B915840096BFB1 /* RNCryptor.framework */,
 				EE35F02D549C5BFAF53568AC /* Pods_SafeVaultSB.framework */,
 			);
 			name = Frameworks;
@@ -279,6 +355,7 @@
 				2314AB0E24AF792B00823415 /* Frameworks */,
 				2314AB0F24AF792B00823415 /* Resources */,
 				B3871F850C481030DD49788A /* [CP] Embed Pods Frameworks */,
+				235349EC24B915840096BFB1 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -392,22 +469,33 @@
 				235283CD24AFE3BE00891608 /* NSObjectExtension.swift in Sources */,
 				23861F5524B0EAF90033A08B /* AlertHelper.swift in Sources */,
 				23CA0CC924B496EF00219D81 /* IntroPageViewController.swift in Sources */,
+				235349EE24B9B2E20096BFB1 /* VaultFileSerializable.swift in Sources */,
 				230A2D9224AF8B74003448BF /* RegisterViewController.swift in Sources */,
 				2314AB1924AF792B00823415 /* ViewController.swift in Sources */,
+				2353499E24B8D0470096BFB1 /* FileUploadRequest.swift in Sources */,
+				239AC6C224B8C34B00365EEE /* RegisterResponse.swift in Sources */,
+				239AC6C424B8C5EA00365EEE /* TokenRequest.swift in Sources */,
 				23861F6E24B114340033A08B /* VaultFileRepository.swift in Sources */,
+				239AC6B624B89F1F00365EEE /* NetworkAuthHandler.swift in Sources */,
 				23CA0CD024B4990B00219D81 /* PrimaryButton.swift in Sources */,
 				23861F6724B0F4B60033A08B /* MyFilesFilePicker.swift in Sources */,
+				239AC6BE24B8BA4F00365EEE /* NetworkStatusHelper.swift in Sources */,
 				23861F5324B0E82A0033A08B /* CryptoHelper.swift in Sources */,
+				239AC6BA24B8A27700365EEE /* AuthRequest.swift in Sources */,
 				23962F8224AFC58E00F311DA /* KeychainPasswordItem.swift in Sources */,
 				230A2D9A24AF8D7A003448BF /* Colors.swift in Sources */,
 				23CA0CD424B4994600219D81 /* AuthLabel.swift in Sources */,
 				2314AB1524AF792B00823415 /* AppDelegate.swift in Sources */,
+				239AC6C024B8BC9100365EEE /* MyFilesNetworkHandler.swift in Sources */,
 				23CA0CC624B48E1E00219D81 /* WarningTwoViewController.swift in Sources */,
 				235283CF24AFEB8600891608 /* MyFilesTableViewController.swift in Sources */,
 				23861F6924B0F5230033A08B /* MyFilesViewController.swift in Sources */,
 				23861F7024B124AA0033A08B /* StringExtension.swift in Sources */,
 				23CA0CC324B4825A00219D81 /* IntroViewController.swift in Sources */,
+				239AC6C624B8CFF300365EEE /* NetworkFileHandler.swift in Sources */,
 				2314AB1724AF792B00823415 /* SceneDelegate.swift in Sources */,
+				235349F024B9FDEF0096BFB1 /* ClearHelper.swift in Sources */,
+				239AC6BC24B8A2D700365EEE /* AuthResponse.swift in Sources */,
 				23861F6C24B1130D0033A08B /* AccountRepository.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

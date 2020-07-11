@@ -9,8 +9,10 @@
 import UIKit
 import CryptoSwift
 import BiometricAuthentication
+import Network
 
-class ViewController: UIViewController, UITextFieldDelegate, BiometricsHelperDelegate {
+
+class ViewController: UIViewController, UITextFieldDelegate, BiometricsHelperDelegate, NetworkAuthDelegate {
 
     @IBOutlet weak var logInBtn: UIButton!
     @IBOutlet weak var accountTextField: UITextField!
@@ -20,6 +22,9 @@ class ViewController: UIViewController, UITextFieldDelegate, BiometricsHelperDel
     
     @IBOutlet weak var logoImage: UIImageView!
     
+    private var hasAccount: Bool = false
+    private var isLocalAuthenticated: Bool = false
+    
     private var cryptoHelper: CryptoHelper!
     private var accountRepository: AccountRepository!
     
@@ -28,6 +33,9 @@ class ViewController: UIViewController, UITextFieldDelegate, BiometricsHelperDel
     private let biometricsHelper
         = BiometricsHelper()
     
+    private let networkAuthHandler = NetworkAuthHandler();
+    private let networkStatusHelper = NetworkStatusHelper();
+    
     private func initialize() {
         let appDelegate = (UIApplication.shared.delegate as! AppDelegate)
         
@@ -35,7 +43,9 @@ class ViewController: UIViewController, UITextFieldDelegate, BiometricsHelperDel
         self.cryptoHelper = appDelegate.cryptoHelper
         self.biometricsHelper.delegate = self
         self.biometricsHelper.alertHelper = self.alertHelper
+        self.networkAuthHandler.delegate = self
         
+        self.networkStatusHelper.initializeNetworkMonitor()
     }
     
     override func viewDidLoad() {
@@ -61,6 +71,41 @@ class ViewController: UIViewController, UITextFieldDelegate, BiometricsHelperDel
         animateViewMoving(up: false, moveValue: 100)
     }
     
+    func onAuthenticated(_ token: String) {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.isServerAuthenticated = true
+        
+        // Save token i9lMWxw6
+        self.cryptoHelper.saveTokenOnKeyChain(token: token)
+        
+        if !self.isLocalAuthenticated {
+            let clearHelper = ClearHelper()
+            clearHelper.clearData()
+        }
+        
+        
+        if !self.hasAccount && self.networkStatusHelper.isConnectionAvailable {
+            let clearHelper = ClearHelper()
+            clearHelper.clearData()
+            UserDefaults.standard.set(true, forKey: "syncNeeded")
+            UserDefaults.standard.set(true, forKey: "hasAccount")
+        }
+        
+        
+        self.goToMyFiles()
+    }
+    
+    func onAuthenticationFail(_ error: String) {
+        print("Error: \(error)")
+        errorLabel.text = "AccountID or password are incorrect"
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.isServerAuthenticated = false
+        
+        if self.isLocalAuthenticated {
+            self.goToMyFiles()
+        }
+    }
+    
     // Lifting the view up
     // Got this from stack overflow
     // The fact that I need to do such thing is stupid by itself
@@ -79,9 +124,9 @@ class ViewController: UIViewController, UITextFieldDelegate, BiometricsHelperDel
         
         self.biometricsHelper.checkBiometrics()
         
-        let hasAccount = UserDefaults.standard.value(forKey: "hasAccount") as? Bool
+        self.hasAccount = UserDefaults.standard.value(forKey: "hasAccount") as? Bool ?? false
         
-        if hasAccount != nil && hasAccount! && self.biometricsHelper.canAuthenticate() {
+        if hasAccount && self.biometricsHelper.canAuthenticate() {
             self.biometricsHelper.biometricAuthentication(reason: "Authenticate yourself")
         }
     }
@@ -91,6 +136,7 @@ class ViewController: UIViewController, UITextFieldDelegate, BiometricsHelperDel
     }
     
     func authorized() {
+        UserDefaults.standard.set(false, forKey: "syncNeeded")
         goToMyFiles()
     }
     
@@ -110,9 +156,13 @@ class ViewController: UIViewController, UITextFieldDelegate, BiometricsHelperDel
         let accountID = self.accountTextField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
         self.passwordTextField.text = ""
         
-        // Check if it was sucefull and compare with hash saved in KeyChain
-        if self.authenticate(password: password, accountID: accountID) {
-            goToMyFiles()
+        let hasConnection = self.networkStatusHelper.isConnectionAvailable
+        self.isLocalAuthenticated = self.authenticate(password: password, accountID: accountID)
+        
+        if hasConnection {
+            self.networkAuthHandler.authenticate(accountID: accountID, password: password.sha512())
+        } else if self.isLocalAuthenticated {
+            self.goToMyFiles()
         } else {
             errorLabel.text = "AccountID or password are incorrect"
         }

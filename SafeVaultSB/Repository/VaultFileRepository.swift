@@ -38,6 +38,39 @@ class VaultFileRepository {
         }
     }
     
+    func getVaultFileNotSynced() -> [VaultFile]? {
+        let fetchRequest =
+              NSFetchRequest<VaultFile>(entityName: "VaultFile")
+        
+        
+        fetchRequest.predicate = NSPredicate(format: "isInSync = %@", false)
+        do {
+            return try managedContext.fetch(fetchRequest)
+        } catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
+            return nil
+        }
+    }
+    
+    func getVaultFileByID(id: UUID, context: NSManagedObjectContext? = nil) -> VaultFile? {
+        let fetchRequest =
+              NSFetchRequest<VaultFile>(entityName: "VaultFile")
+            
+        
+        fetchRequest.predicate = NSPredicate(format: "id LIKE %@", id as CVarArg)
+        
+        do {
+            if context != nil {
+                return try context?.fetch(fetchRequest)[0]
+            } else {
+                return try managedContext.fetch(fetchRequest)[0]
+            }
+        } catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
+            return nil
+        }
+    }
+    
     func createVaultFileInstance() -> VaultFile {
         return VaultFile(context: managedContext)
     }

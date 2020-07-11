@@ -8,8 +8,9 @@
 
 import UIKit
 import CoreData
+import Network
 
-class RegisterViewController: UIViewController, UITextFieldDelegate {
+class RegisterViewController: UIViewController, UITextFieldDelegate, NetworkAuthDelegate {
 
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var repasswordTextField: UITextField!
@@ -19,10 +20,18 @@ class RegisterViewController: UIViewController, UITextFieldDelegate {
     
     @IBOutlet weak var logoImage: UIImageView!
     
+    @IBOutlet weak var errorLabel: UILabel!
+    
     private var cryptoHelper: CryptoHelper!
     private var accountRepository: AccountRepository!
     private var vaultFileRepository: VaultFileRepository!
     
+    let networkAuthHandler = NetworkAuthHandler()
+    let networkStatusHelper = NetworkStatusHelper()
+    
+    var unhashedPassword: String = ""
+    
+    var isConnectionAvailable = false
     
     private func initialize() {
         let appDelegate = (UIApplication.shared.delegate as! AppDelegate)
@@ -30,6 +39,11 @@ class RegisterViewController: UIViewController, UITextFieldDelegate {
         self.accountRepository = appDelegate.accountRepository
         self.vaultFileRepository = appDelegate.vaultFileRepository
         self.cryptoHelper = appDelegate.cryptoHelper
+        
+        self.networkAuthHandler.delegate = self
+        self.networkStatusHelper.delegate = self
+        
+        self.networkStatusHelper.initializeNetworkMonitor()
     }
     
     override func viewDidLoad() {
@@ -47,7 +61,7 @@ class RegisterViewController: UIViewController, UITextFieldDelegate {
             self.logoImage.image = #imageLiteral(resourceName: "logoDark")
         }
     }
-
+    
     func textFieldDidBeginEditing(_ textField: UITextField) {
         animateViewMoving(up: true, moveValue: 100)
     }
@@ -104,18 +118,54 @@ class RegisterViewController: UIViewController, UITextFieldDelegate {
         self.register(password: password)
     }
     
+    private func setEnabled(enabled: Bool) {
+        self.registerBtn.isEnabled = enabled
+        self.passwordTextField.isEnabled = enabled
+        self.repasswordTextField.isEnabled = enabled
+    }
+    
     private func register(password: String) {
-        self.clearData()
+        let clearHelper = ClearHelper()
+        clearHelper.clearData()
         
-        let account = self.accountRepository.createAccount(password: self.passwordTextField.text!)
+        self.unhashedPassword = password
         
-        self.cryptoHelper.saveOnKeyChain(accountId: account.accountID!, password: account.password!)
-        print(account.accountID!)
-               
+        let account = self.accountRepository.createAccount(password: password)
+        
+        self.networkAuthHandler.register(accountID: account.accountID!, password: account.password!)
+        
+        self.setEnabled(enabled: false)
+    }
+    
+    func onAuthenticated(_ token: String) {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.isServerAuthenticated = true
+        
+        // Save token
+        self.cryptoHelper.saveTokenOnKeyChain(token: token)
+    }
+    
+    func onAuthenticationFail(_ error: String) {
+        self.setEnabled(enabled: false)
+        self.errorLabel.text = "Error creating account"
+    }
+    
+    func onRegister(permanentToken: String) {
+        self.cryptoHelper.savePermanentTokenOnKeyChain(token: permanentToken)
+        
+        let account = self.accountRepository.getAccount()!
+        
+        self.cryptoHelper.saveOnKeyChain(accountId: account.accountID!, password: self.unhashedPassword)
+        self.unhashedPassword = ""
                
         UserDefaults.standard.set(true, forKey: "hasAccount")
         
         self.showIntro()
+    }
+    
+    func onRegisterFail(_ error: String) {
+        self.setEnabled(enabled: true)
+        self.errorLabel.text = "Error creating account"
     }
     
     private func showIntro() {
@@ -128,38 +178,20 @@ class RegisterViewController: UIViewController, UITextFieldDelegate {
         
         self.present(introController, animated: true, completion: nil)
     }
-    
-     // Clear all previous data
-    private func clearData() {
-        // Delete Core Data
-        self.accountRepository.deletePreviousAccounts()
-        self.vaultFileRepository.deletePreviousFiles()
-        // Delete files
-        self.deleteFilesInDocumentsFolder()
+}
+
+extension RegisterViewController: NetworkStatusDelegate {
+    func onNetworkAvailable() {
+        DispatchQueue.main.async {
+            self.setEnabled(enabled: true)
+            self.errorLabel.text = ""
+        }
     }
     
-    // Delete all files in documents folder
-    // Yup name explains itself
-    private func deleteFilesInDocumentsFolder() {
-        // Super expensive operation would block UI
-        DispatchQueue.global(qos: .background).async {
-            let fileManager = FileManager.default
-            let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first! as NSURL
-            let documentsPath = documentsUrl.path
-            
-            do {
-                if let documentPath = documentsPath
-                {
-                    let fileNames = try fileManager.contentsOfDirectory(atPath: "\(documentPath)")
-                    for fileName in fileNames {
-                        let filePathName = "\(documentPath)/\(fileName)"
-                        try fileManager.removeItem(atPath: filePathName)
-                    }
-                }
-
-            } catch {
-                print("Could not clear folder: \(error)")
-            }
+    func onNetworkNotAvailable() {
+        DispatchQueue.main.async {
+            self.setEnabled(enabled: false)
+            self.errorLabel.text = "Internet connection is needed!"
         }
     }
 }

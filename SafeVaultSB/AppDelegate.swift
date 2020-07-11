@@ -16,6 +16,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var accountRepository = AccountRepository()
     lazy var vaultFileRepository = VaultFileRepository()
     
+    var isServerAuthenticated: Bool = false
+    
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -74,6 +76,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let context = persistentContainer.viewContext
         if context.hasChanges {
             do {
+                context.mergePolicy = NSMergePolicy(merge: NSMergePolicyType.mergeByPropertyObjectTrumpMergePolicyType)
+
                 try context.save()
             } catch {
                 // Replace this implementation with code to handle the error appropriately.
