@@ -10,6 +10,6 @@ target 'SafeVaultSB' do
   pod 'BiometricAuthentication'
   pod 'Observable'
   pod 'Alamofire', '~> 5.2'
-
+  pod 'AlamofireNetworkActivityIndicator', '~> 3.1'
 
 end

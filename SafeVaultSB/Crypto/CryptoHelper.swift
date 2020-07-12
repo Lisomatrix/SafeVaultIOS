@@ -150,6 +150,7 @@ class CryptoHelper {
         inputStream.close()
         outputStream.close()
         
+        
         return iv
     }
     

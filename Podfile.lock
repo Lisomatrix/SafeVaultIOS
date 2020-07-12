@@ -1,11 +1,14 @@
 PODS:
   - Alamofire (5.2.1)
+  - AlamofireNetworkActivityIndicator (3.1.0):
+    - Alamofire (~> 5.1)
   - BiometricAuthentication (3.1.2)
   - CryptoSwift (1.3.1)
   - Observable (2.0.1)
 
 DEPENDENCIES:
   - Alamofire (~> 5.2)
+  - AlamofireNetworkActivityIndicator (~> 3.1)
   - BiometricAuthentication
   - CryptoSwift (~> 1.0)
   - Observable
@@ -13,16 +16,18 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - Alamofire
+    - AlamofireNetworkActivityIndicator
     - BiometricAuthentication
     - CryptoSwift
     - Observable
 
 SPEC CHECKSUMS:
   Alamofire: e911732990610fe89af59ac0077f923d72dc3dfd
+  AlamofireNetworkActivityIndicator: 6564782bd7b9e6c430ae67d9277af01907b01ca4
   BiometricAuthentication: 36445f3ab77699489f91995bed887be89890afac
   CryptoSwift: f12f037f6d0fcd6d48c96db0071b653de64e6c4d
   Observable: c94150db5a2e43391d46a247bd395ce1a544b81a
 
-PODFILE CHECKSUM: b6d0b885c885e941cfd767113e5c43f6a5ce73f9
+PODFILE CHECKSUM: 9143544b3f79be396f4153a52d0fd261e27123a0
 
 COCOAPODS: 1.9.3

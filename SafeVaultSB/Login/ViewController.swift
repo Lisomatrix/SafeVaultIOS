@@ -75,7 +75,7 @@ class ViewController: UIViewController, UITextFieldDelegate, BiometricsHelperDel
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.isServerAuthenticated = true
         
-        // Save token i9lMWxw6
+        // Save token
         self.cryptoHelper.saveTokenOnKeyChain(token: token)
         
         if !self.isLocalAuthenticated {

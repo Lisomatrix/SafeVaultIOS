@@ -119,6 +119,7 @@ extension MyFilesViewController: UIDocumentPickerDelegate {
         
         let isAuthenticated = self.networkAuthHandler.isAuthenticated
         
+        
         DispatchQueue.global(qos: .background).async {
             let iv = self.cryptoHelper.encryptFile(inputUri: selectedFile, outputUri: fileURL, key: vaultFile.key!, wrapper: wrapper)
             
@@ -129,29 +130,19 @@ extension MyFilesViewController: UIDocumentPickerDelegate {
             vaultFile.iv = base64String
             vaultFile.isInSync = false
             
-            DispatchQueue.main.async {
-                if isAuthenticated {
+            if isAuthenticated {
+                DispatchQueue.main.async {
+                    
                     vaultFile.isInSync = true
                     wrapper.file = vaultFile
                     wrapper.obs = MutableObservable<Float>(0)
                     wrapper.task = TaskName.Upload
-                    
+                        
                     // Add to tasks list
                     self.tasks[wrapper.file!.id!] = wrapper
                     self.vaultFileRepository.saveVaultFile(vaultFile: vaultFile)
                     self.networkFileHandler.requestFileUpload(vaultFile: vaultFile, fileURL: vaultFile.path!, wrapper: wrapper)
-                    
                 }
-                
-                
-            }
-            
-            // Delete selected file
-            do {
-                
-                try FileManager.default.removeItem(at: selectedFile)
-            } catch {
-                print("Error: \(error)")
             }
         }
         
