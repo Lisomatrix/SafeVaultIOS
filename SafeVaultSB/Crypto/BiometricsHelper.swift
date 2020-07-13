@@ -130,7 +130,6 @@ class BiometricsHelper {
                     self?.showPasscodeAuthentication(message: error.message())
                     break
                     
-                // do nothing on canceled by system or user
                 case .canceledBySystem, .canceledByUser:
                     self?.delegate?.unauthorized()
                     break

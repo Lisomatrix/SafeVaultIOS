@@ -41,11 +41,19 @@ class ViewController: UIViewController, UITextFieldDelegate, BiometricsHelperDel
         
         self.accountRepository = appDelegate.accountRepository
         self.cryptoHelper = appDelegate.cryptoHelper
+        
+        // Biometrics
         self.biometricsHelper.delegate = self
         self.biometricsHelper.alertHelper = self.alertHelper
+        // Network Auth
         self.networkAuthHandler.delegate = self
         
         self.networkStatusHelper.initializeNetworkMonitor()
+        
+        // Remove previous controllers from the stack
+        self.navigationController?.viewControllers.removeAll(where: { (vc) -> Bool in
+            return !vc.isKind(of: ViewController.self)
+        })
     }
     
     override func viewDidLoad() {
@@ -158,6 +166,8 @@ class ViewController: UIViewController, UITextFieldDelegate, BiometricsHelperDel
         
         let hasConnection = self.networkStatusHelper.isConnectionAvailable
         self.isLocalAuthenticated = self.authenticate(password: password, accountID: accountID)
+        
+        UserDefaults.standard.set(accountID, forKey: "accountID")
         
         if hasConnection {
             self.networkAuthHandler.authenticate(accountID: accountID, password: password.sha512())

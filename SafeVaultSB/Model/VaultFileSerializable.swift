@@ -11,9 +11,9 @@ import Foundation
 struct VaultFileSerializable : Codable {
     let fileServerId: String
     let fileClientId: String
-    let fileExtension: String
-    let key: String
-    let name: String
+    var fileExtension: String
+    var key: String
+    var name: String
     let size: Int64
     let iv: String
 }

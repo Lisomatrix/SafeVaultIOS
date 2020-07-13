@@ -8,6 +8,7 @@
 
 import Foundation
 import Alamofire
+import CryptoSwift
 
 protocol NetworkFileDelegate {
     func onFilesData(files: [VaultFileSerializable])
@@ -50,12 +51,50 @@ class NetworkFileHandler {
             let decoder = JSONDecoder()
             
             do {
-                let data = try decoder.decode(Array<VaultFileSerializable>.self, from: response.data!)
+                var data = try decoder.decode(Array<VaultFileSerializable>.self, from: response.data!)
+                
+                for i in 0..<data.count {
+                    data[i] = self.decryptFile(&data[i])
+                }
+                
                 self.delegate?.onFilesData(files: data)
             } catch {
                 print("error: \(error)")
             }
         }
+    }
+    
+    private func decryptFile(_ receivedFile: inout VaultFileSerializable) -> VaultFileSerializable {
+        
+        guard let password = self.appDelegate.cryptoHelper.getKeyChainPassword() else {
+            return receivedFile
+        }
+        
+        do {
+            let subIV = receivedFile.iv[0...11]
+            let subKey = password[0...31]
+            let decryptor = try ChaCha20(key: subKey, iv: subIV)
+         
+            // Base64 String to array
+            let nameInt8Array = [UInt8](Data(base64Encoded: receivedFile.name)!)
+            let extensionInt8Array = [UInt8](Data(base64Encoded: receivedFile.fileExtension)!)
+            let keyInt8Array = [UInt8](Data(base64Encoded: receivedFile.key)!)
+
+            // Decrypt data
+            let fileName = Data(try decryptor.decrypt(nameInt8Array))
+            let fileExtension = Data(try decryptor.decrypt(extensionInt8Array))
+            let key = Data(try decryptor.decrypt(keyInt8Array))
+                      
+            // To String
+            receivedFile.name = String(data: fileName, encoding: .utf8)!
+            receivedFile.fileExtension = String(data: fileExtension, encoding: .utf8)!
+            receivedFile.key = String(data: key, encoding: .utf8)!
+            
+        } catch {
+            print("Error: \(error)")
+        }
+        
+        return receivedFile
     }
     
     func getFile(fileID: String, destinationURL: URL, fileName: String, wrapper: VaultFileWrapper? = nil) {
@@ -89,29 +128,66 @@ class NetworkFileHandler {
         
         if token == nil {return}
         
-        let uploadFileRequest = FileUploadRequest(
-            fileClientId: vaultFile.id!.uuidString,
-            name: vaultFile.name!,
-            fileExtension: vaultFile.fileExtension!,
-            size: vaultFile.size,
-            iv: vaultFile.iv!,
-            key: vaultFile.key!
-        )
-        
-        self.fileID = vaultFile.id!.uuidString.replacingOccurrences(of: "-", with: "")
-        
-        let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(token ?? "")",
-            "Content-Type": "application/json"
-        ]
+        guard let password = self.appDelegate.cryptoHelper.getKeyChainPassword() else {
+            return
+        }
     
-        AF.request(
-            baseURL + "upload",
-            method: .post,
-            parameters: uploadFileRequest,
-            encoder: JSONParameterEncoder.default,
-            headers: headers
-        ).response { response in self.handleFileRequest(response: response, url: fileURL, wrapper: wrapper)}
+        do {
+            
+            let subIV = vaultFile.iv![0...11]
+            let subKey = password[0...31]
+            let encryptor = try ChaCha20(key: subKey, iv: subIV)
+             
+            let fileNameEnc = try encryptor.encrypt([UInt8](vaultFile.name!.utf8))
+            let fileExtensionEnc = try encryptor.encrypt([UInt8](vaultFile.fileExtension!.utf8))
+            let keyEnc = try encryptor.encrypt([UInt8](vaultFile.key!.utf8))
+            
+            print("Enc: \(fileNameEnc)")
+            print("Original Base64: \(vaultFile.name!.toBase64())")
+            print("Enc Base64: \(fileNameEnc.toBase64())")
+            
+            // Original
+            /*
+            let uploadFileRequest = FileUploadRequest(
+                    fileClientId: vaultFile.id!.uuidString,
+                    name: vaultFile.name!,
+                    fileExtension: vaultFile.fileExtension!,
+                    size: vaultFile.size,
+                    iv: vaultFile.iv!,
+                    key: vaultFile.key!
+            )*/
+            
+            
+            let uploadFileRequest = FileUploadRequest(
+                    fileClientId: vaultFile.id!.uuidString,
+                    name: fileNameEnc.toBase64()!,
+                    fileExtension: fileExtensionEnc.toBase64()!,
+                    size: vaultFile.size,
+                    iv: vaultFile.iv!,
+                    key: keyEnc.toBase64()!
+            )
+                
+                
+                
+            self.fileID = vaultFile.id!.uuidString.replacingOccurrences(of: "-", with: "")
+                
+            let headers: HTTPHeaders = [
+                "Authorization": "Bearer \(token ?? "")",
+                "Content-Type": "application/json"
+            ]
+            
+            AF.request(
+                baseURL + "upload",
+                method: .post,
+                parameters: uploadFileRequest,
+                encoder: JSONParameterEncoder.default,
+                headers: headers
+            ).response { response in self.handleFileRequest(response: response, url: fileURL, wrapper: wrapper)}
+            
+        } catch {
+            print("Error: \(error)")
+            return
+        }
     }
     
     private func handleFileRequest(response: AFDataResponse<Data?>, url: URL, wrapper: VaultFileWrapper?) {

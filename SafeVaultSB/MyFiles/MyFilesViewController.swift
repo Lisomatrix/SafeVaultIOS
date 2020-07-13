@@ -70,14 +70,29 @@ extension MyFilesViewController: UISearchControllerDelegate, UISearchResultsUpda
         self.vaultFileRepository = appDelegate.vaultFileRepository
         self.cryptoHelper = appDelegate.cryptoHelper
         
+        if appDelegate.accountID == nil {
+            appDelegate.accountID = UserDefaults.standard.value(forKey: "accountID") as? String
+        }
+        
+        // Remove previous controllers from the stack
+        self.navigationController?.viewControllers.removeAll(where: { (vc) -> Bool in
+            return !vc.isKind(of: MyFilesViewController.self)
+        })
+        
+        // Network status
         self.networkStatusHelper.delegate = self
+        // Biometrics
         self.biometricsHelper.alertHelper = self.alertHelper
+        self.biometricsHelper.delegate = self
+        // Network Auth
         self.networkAuthHandler.delegate = self
+        // Network file
         self.networkFileHandler.delegate = self
         
         self.networkStatusHelper.initializeNetworkMonitor()
         self.initializeSearchController()
         
+        // Sync data if needed
         self.syncData()
         
         // Remove separators

@@ -12,17 +12,39 @@ import MobileCoreServices
 import CommonCrypto
 import LocalAuthentication
 import RNCryptor
+import UIKit
 
 class CryptoHelper {
+    
+    let keyHashAlias = "keyHash"
     
     // Compare given hash with the one saved in KeyChain
     func checkKeyChainPassword(accountID: String, hashedPassword: String) -> Bool {
         do {
             let storedPasswordHash = try KeychainPasswordItem(accountID).readPassword()
             
-            return hashedPassword == storedPasswordHash
+            let isEqual = hashedPassword == storedPasswordHash
+            
+            if isEqual {
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                
+                appDelegate.accountID = accountID
+            }
+            
+            return isEqual
         } catch {
             return false
+        }
+    }
+    
+    func getKeyChainPassword() -> String? {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        do {
+            return try KeychainPasswordItem(appDelegate.accountID!).readPassword()
+                   
+        } catch {
+            return nil
         }
     }
     
@@ -31,6 +53,8 @@ class CryptoHelper {
         do {
             // Hashing is never to much
             try KeychainPasswordItem(accountId).savePassword(password.sha512())
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.accountID = accountId
         } catch {
             print("Error on saving password on keychain: ", error)
         }

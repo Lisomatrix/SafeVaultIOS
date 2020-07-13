@@ -135,6 +135,7 @@ class RegisterViewController: UIViewController, UITextFieldDelegate, NetworkAuth
         self.networkAuthHandler.register(accountID: account.accountID!, password: account.password!)
         
         self.setEnabled(enabled: false)
+        UserDefaults.standard.set(account.accountID!, forKey: "accountID")
     }
     
     func onAuthenticated(_ token: String) {

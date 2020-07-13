@@ -21,9 +21,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
     
+    var accountID: String? = nil
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         NetworkActivityIndicatorManager.shared.isEnabled = true
+        
+        self.accountID = UserDefaults.standard.value(forKey: "accountID") as? String
 
         return true
     }
