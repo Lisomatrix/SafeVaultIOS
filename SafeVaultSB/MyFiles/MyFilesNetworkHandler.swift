@@ -65,12 +65,6 @@ extension MyFilesViewController: NetworkStatusDelegate, NetworkAuthDelegate, Net
     }
     
     func onFilesData(files: [VaultFileSerializable]) {
-        if self.syncInProgress {
-            for file in files {
-                self.prepareFileDownload(file)
-            }
-        }
-        
         self.checkFilesNeedingSync(serverFiles: files)
     }
     
@@ -97,10 +91,6 @@ extension MyFilesViewController: NetworkStatusDelegate, NetworkAuthDelegate, Net
             }
         }
         
-        for file in fileToDownload {
-            self.prepareFileDownload(file)
-        }
-        
         return fileToDownload
     }
     
@@ -118,9 +108,15 @@ extension MyFilesViewController: NetworkStatusDelegate, NetworkAuthDelegate, Net
         
         let filesNeedingSync = self.checkFilesToDownload(serverFiles)
         
+        print("")
+        print("count: \(filesNeedingSync.count)")
+        print("")
+        var c = 1
         // Download files
         for file in filesNeedingSync {
             self.prepareFileDownload(file)
+            print("count: \(c)")
+            c += 1
         }
         
         self.tableView.reloadData()

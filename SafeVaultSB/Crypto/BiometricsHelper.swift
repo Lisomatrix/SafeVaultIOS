@@ -110,12 +110,10 @@ class BiometricsHelper {
                 // device does not support biometric (face id or touch id) authentication
                 case .biometryNotAvailable:
                     self?.showPasscodeAuthentication(message: error.message())
-                    self?.delegate?.unauthorized()
                     break
                     
                 // No biometry enrolled in this device, ask user to register fingerprint or face
                 case .biometryNotEnrolled:
-                    self?.delegate?.unauthorized()
                     self?.alertHelper?.showGotoSettingsAlert(message: error.message())
                     break
                     

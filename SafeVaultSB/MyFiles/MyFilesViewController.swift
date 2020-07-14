@@ -92,22 +92,16 @@ extension MyFilesViewController: UISearchControllerDelegate, UISearchResultsUpda
         self.networkStatusHelper.initializeNetworkMonitor()
         self.initializeSearchController()
         
-        // Sync data if needed
-        //self.syncData()
-        self.networkFileHandler.getFileData()
+        
+        if appDelegate.isServerAuthenticated {
+            // Sync data if needed
+            self.networkFileHandler.getFileData()
+        }
         
         // Remove separators
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
         
         self.fetchedResultsController = vaultFileRepository.getFetchedResultsController(tableController: self)
-    }
-    
-    private func syncData() {
-        let isSyncNeeded = UserDefaults.standard.value(forKey: "syncNeeded") as? Bool ?? false
-        
-        if isSyncNeeded {
-            self.syncInProgress = true
-        }
     }
     
     @IBAction func onAddPressed(_ sender: UIBarButtonItem) {

@@ -95,7 +95,6 @@ class ViewController: UIViewController, UITextFieldDelegate, BiometricsHelperDel
         if !self.hasAccount && self.networkStatusHelper.isConnectionAvailable {
             let clearHelper = ClearHelper()
             clearHelper.clearData()
-            UserDefaults.standard.set(true, forKey: "syncNeeded")
             UserDefaults.standard.set(true, forKey: "hasAccount")
         }
         
@@ -168,6 +167,7 @@ class ViewController: UIViewController, UITextFieldDelegate, BiometricsHelperDel
         self.isLocalAuthenticated = self.authenticate(password: password, accountID: accountID)
         
         UserDefaults.standard.set(accountID, forKey: "accountID")
+        self.cryptoHelper.saveOnKeyChain(accountId: accountID, password: password)
         
         if hasConnection {
             self.networkAuthHandler.authenticate(accountID: accountID, password: password.sha512())
