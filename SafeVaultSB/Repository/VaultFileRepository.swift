@@ -23,6 +23,18 @@ class VaultFileRepository {
         entity = NSEntityDescription.entity(forEntityName: "VaultFile", in: managedContext)!
     }
     
+    func getVaultFiles() -> [VaultFile]? {
+        let fetchRequest =
+          NSFetchRequest<VaultFile>(entityName: "VaultFile")
+        
+        do {
+            return try managedContext.fetch(fetchRequest)
+        } catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
+            return nil
+        }
+    }
+    
     func getVaultFilesByName(name: String) -> [VaultFile]? {
         
         let fetchRequest =
@@ -43,7 +55,7 @@ class VaultFileRepository {
               NSFetchRequest<VaultFile>(entityName: "VaultFile")
         
         
-        fetchRequest.predicate = NSPredicate(format: "isInSync = %@", false)
+        fetchRequest.predicate = NSPredicate(format: "isInSync == NO")
         do {
             return try managedContext.fetch(fetchRequest)
         } catch let error as NSError {

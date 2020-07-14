@@ -93,7 +93,8 @@ extension MyFilesViewController: UISearchControllerDelegate, UISearchResultsUpda
         self.initializeSearchController()
         
         // Sync data if needed
-        self.syncData()
+        //self.syncData()
+        self.networkFileHandler.getFileData()
         
         // Remove separators
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
@@ -105,7 +106,7 @@ extension MyFilesViewController: UISearchControllerDelegate, UISearchResultsUpda
         let isSyncNeeded = UserDefaults.standard.value(forKey: "syncNeeded") as? Bool ?? false
         
         if isSyncNeeded {
-            self.networkFileHandler.getFileData()
+            self.syncInProgress = true
         }
     }
     

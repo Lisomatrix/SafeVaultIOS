@@ -17,9 +17,10 @@ enum TaskName {
     case Upload
 }
 
-struct VaultFileWrapper {
+class VaultFileWrapper {
     var file: VaultFile?
     var obs: MutableObservable<Float>?
     var disposable: Disposable?
     var task: TaskName?
+    var remove: Bool = false
 }

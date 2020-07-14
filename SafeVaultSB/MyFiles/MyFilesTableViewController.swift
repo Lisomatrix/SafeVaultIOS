@@ -42,6 +42,8 @@ class MyFilesViewController: UITableViewController, NSFetchedResultsControllerDe
     let networkStatusHelper = NetworkStatusHelper()
     let networkFileHandler = NetworkFileHandler()
     
+    var syncInProgress = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -167,14 +169,8 @@ class MyFilesViewController: UITableViewController, NSFetchedResultsControllerDe
         } else {
             self.tableView.reloadData()
         }
-        
-        // Set up the cell
-        /*guard let file = self.fetchedResultsController?.object(at: indexPath) else {
-            fatalError("Attempt to configure cell without a managed object")
-        }*/
        
         // If previous holding file is not equal then
-        
         // stop the observable and update properties
         if cell.objectID == nil || cell.objectID != file?.id {
             cell.disposable?.dispose()
@@ -213,9 +209,16 @@ class MyFilesViewController: UITableViewController, NSFetchedResultsControllerDe
                     DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
                         cell.reset()
                     }
+                 
                     // And cleanup this task
                     self.tasks.removeValue(forKey: wrapper!.file!.id!)
                     wrapper?.disposable?.dispose()
+                    
+                    // In case it was flagged to be removed
+                    if wrapper!.remove {
+                        // Remove from core data
+                        self.vaultFileRepository.removeFile(vaultFile: wrapper!.file!)
+                    }
                 }
             }
             

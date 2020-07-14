@@ -34,6 +34,7 @@
 		23861F6C24B1130D0033A08B /* AccountRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23861F6B24B1130D0033A08B /* AccountRepository.swift */; };
 		23861F6E24B114340033A08B /* VaultFileRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23861F6D24B114340033A08B /* VaultFileRepository.swift */; };
 		23861F7024B124AA0033A08B /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23861F6F24B124AA0033A08B /* StringExtension.swift */; };
+		239044DB24BE37BF00EF5C84 /* VaultFileExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 239044DA24BE37BF00EF5C84 /* VaultFileExtension.swift */; };
 		23962F8224AFC58E00F311DA /* KeychainPasswordItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23962F8124AFC58E00F311DA /* KeychainPasswordItem.swift */; };
 		239AC6B624B89F1F00365EEE /* NetworkAuthHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 239AC6B524B89F1F00365EEE /* NetworkAuthHandler.swift */; };
 		239AC6BA24B8A27700365EEE /* AuthRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 239AC6B924B8A27700365EEE /* AuthRequest.swift */; };
@@ -96,6 +97,7 @@
 		23861F6B24B1130D0033A08B /* AccountRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRepository.swift; sourceTree = "<group>"; };
 		23861F6D24B114340033A08B /* VaultFileRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultFileRepository.swift; sourceTree = "<group>"; };
 		23861F6F24B124AA0033A08B /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
+		239044DA24BE37BF00EF5C84 /* VaultFileExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultFileExtension.swift; sourceTree = "<group>"; };
 		23962F8124AFC58E00F311DA /* KeychainPasswordItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainPasswordItem.swift; sourceTree = "<group>"; };
 		239AC6B524B89F1F00365EEE /* NetworkAuthHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkAuthHandler.swift; sourceTree = "<group>"; };
 		239AC6B924B8A27700365EEE /* AuthRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthRequest.swift; sourceTree = "<group>"; };
@@ -135,6 +137,7 @@
 			children = (
 				2311880824B2687600005507 /* VaultFileWrapper.swift */,
 				235349ED24B9B2E20096BFB1 /* VaultFileSerializable.swift */,
+				239044DA24BE37BF00EF5C84 /* VaultFileExtension.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -477,6 +480,7 @@
 				239AC6C424B8C5EA00365EEE /* TokenRequest.swift in Sources */,
 				23861F6E24B114340033A08B /* VaultFileRepository.swift in Sources */,
 				239AC6B624B89F1F00365EEE /* NetworkAuthHandler.swift in Sources */,
+				239044DB24BE37BF00EF5C84 /* VaultFileExtension.swift in Sources */,
 				23CA0CD024B4990B00219D81 /* PrimaryButton.swift in Sources */,
 				23861F6724B0F4B60033A08B /* MyFilesFilePicker.swift in Sources */,
 				239AC6BE24B8BA4F00365EEE /* NetworkStatusHelper.swift in Sources */,

@@ -12,20 +12,6 @@ import Observable
 
 extension MyFilesViewController: NetworkStatusDelegate, NetworkAuthDelegate, NetworkFileDelegate {
     
-    
-    func syncFiles() {
-        let files = self.vaultFileRepository.getVaultFileNotSynced()
-               
-        if files == nil {return}
-               
-        for file in files! { // 8oWljWdF
-            self.networkFileHandler.requestFileUpload(vaultFile: file, fileURL: file.path!)
-            file.isInSync = true
-            self.vaultFileRepository.saveVaultFile(vaultFile: file)
-            UserDefaults.standard.set(false, forKey: "syncNeeded")
-        }
-    }
-    
     func onAuthenticated(_ token: String) {
         self.cryptoHelper.saveTokenOnKeyChain(token: token)
         
@@ -33,7 +19,8 @@ extension MyFilesViewController: NetworkStatusDelegate, NetworkAuthDelegate, Net
         appDelegate.isServerAuthenticated = true
         
         DispatchQueue.global(qos: .background).async {
-            self.syncFiles()
+            // This will trigger a sync
+            self.networkFileHandler.getFileData()
         }
     }
     
@@ -61,41 +48,122 @@ extension MyFilesViewController: NetworkStatusDelegate, NetworkAuthDelegate, Net
         
     }
     
+    func toVaultFile(_ file: VaultFileSerializable) -> VaultFile {
+        let vaultFile = self.vaultFileRepository.createVaultFileInstanceUniserted()
+        
+        let id = UUID(uuidString: file.fileClientId)
+        
+        vaultFile.id = id
+        vaultFile.isInSync = true
+        vaultFile.key = file.key
+        vaultFile.iv = file.iv
+        vaultFile.fileExtension = file.fileExtension
+        vaultFile.name = file.name
+        vaultFile.size = file.size
+        
+        return vaultFile
+    }
+    
     func onFilesData(files: [VaultFileSerializable]) {
-        for file in files {
-            let vaultFile = self.vaultFileRepository.createVaultFileInstanceUniserted()
-            
-            let id = UUID(uuidString: file.fileClientId)
-            
-            vaultFile.id = id
-            vaultFile.isInSync = true
-            vaultFile.key = file.key
-            vaultFile.iv = file.iv
-            vaultFile.fileExtension = file.fileExtension
-            vaultFile.name = file.name
-            vaultFile.size = file.size
-            
-            let fileName = UUID().uuidString + ".enc"
-            let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-            let fileURL = dir.appendingPathComponent(fileName)
-            
-            
-            vaultFile.path = fileURL
-            
-            self.vaultFileRepository.saveVaultFile(vaultFile: vaultFile)
-            
-            // Wrapper for the task
-            var wrapper = VaultFileWrapper()
-            wrapper.file = vaultFile
-            wrapper.obs = MutableObservable<Float>(0)
-            wrapper.task = TaskName.Download
-                
-            // Add to tasks list
-            self.tasks[id!] = wrapper
-            
-            self.tableView.reloadData()
-            self.networkFileHandler.getFile(fileID: file.fileClientId, destinationURL: fileURL, fileName: fileName, wrapper: wrapper)
+        if self.syncInProgress {
+            for file in files {
+                self.prepareFileDownload(file)
+            }
         }
+        
+        self.checkFilesNeedingSync(serverFiles: files)
+    }
+    
+    
+    func checkFilesToDownload(_ serverFiles: [VaultFileSerializable]) -> [VaultFileSerializable] {
+        let files = self.vaultFileRepository.getVaultFiles()
+        
+        // If we don't have files then get them all
+        if files == nil {return serverFiles}
+        
+        var fileToDownload: [VaultFileSerializable] = []
+        
+        for serverFile in serverFiles {
+            var found = false
+            for file in files! {
+                if serverFile.fileClientId == file.id!.uuidString {
+                    found = true
+                    break
+                }
+            }
+            
+            if !found {
+                fileToDownload.append(serverFile)
+            }
+        }
+        
+        for file in fileToDownload {
+            self.prepareFileDownload(file)
+        }
+        
+        return fileToDownload
+    }
+    
+    func checkFilesNeedingSync(serverFiles: [VaultFileSerializable]) {
+        
+        // files needing upload
+        let unsycedFiles = self.vaultFileRepository.getVaultFileNotSynced()
+        
+        if unsycedFiles != nil {
+            // Upload files
+            for file in unsycedFiles! {
+                self.prepareFileUpload(file)
+            }
+        }
+        
+        let filesNeedingSync = self.checkFilesToDownload(serverFiles)
+        
+        // Download files
+        for file in filesNeedingSync {
+            self.prepareFileDownload(file)
+        }
+        
+        self.tableView.reloadData()
+    }
+    
+    private func prepareFileDownload(_ file: VaultFileSerializable) {
+        let vaultFile = self.toVaultFile(file)
+        
+        let fileName = UUID().uuidString + ".enc"
+        let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileURL = dir.appendingPathComponent(fileName)
+        
+        vaultFile.path = fileURL
+        
+        // Wrapper for the task
+        let wrapper = VaultFileWrapper()
+        wrapper.file = vaultFile
+        wrapper.obs = MutableObservable<Float>(0)
+        wrapper.task = TaskName.Download
+            
+        // Add to tasks list
+        self.tasks[vaultFile.id!] = wrapper
+        
+        self.vaultFileRepository.saveVaultFile(vaultFile: vaultFile)
+        
+        //self.tableView.reloadData()
+        self.networkFileHandler.getFile(fileID: file.fileClientId, destinationURL: fileURL, fileName: fileName, wrapper: wrapper)
+    }
+    
+    func prepareFileUpload(_ file: VaultFile) {
+        // Wrapper for the task
+        let wrapper = VaultFileWrapper()
+        wrapper.file = file
+        wrapper.obs = MutableObservable<Float>(0)
+        wrapper.task = TaskName.Upload
+        
+        file.constructNewURL()
+        
+        self.vaultFileRepository.saveVaultFile(vaultFile: file)
+
+        // Add to tasks list
+        self.tasks[wrapper.file!.id!] = wrapper
+        self.networkFileHandler.requestFileUpload(vaultFile: file, wrapper: wrapper)
     }
     
     func onFileDownloaded(path: String) {

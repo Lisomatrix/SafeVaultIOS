@@ -59,13 +59,15 @@ extension MyFilesViewController: UIDocumentPickerDelegate {
         let vaultFile = self.selectedVaultFile!
         self.selectedVaultFile = nil
         
+        vaultFile.constructNewURL()
+        
         // Create path with original file name
         var newFile = selectedFolder
         
         newFile.appendPathComponent("\(vaultFile.name!)")
         
         // Wrapper for the task
-        var wrapper = VaultFileWrapper()
+        let wrapper = VaultFileWrapper()
         wrapper.file = vaultFile
         wrapper.obs = MutableObservable<Float>(0)
         wrapper.task = TaskName.Decrypt
@@ -97,7 +99,7 @@ extension MyFilesViewController: UIDocumentPickerDelegate {
         let fileURL = dir.appendingPathComponent(newFile)
             
         vaultFile.path = fileURL
-        
+
         // Generate a String to be used as key
         // Inside encrypt method it will be changed by PBKDF2
         // In order to make it secure
@@ -107,7 +109,7 @@ extension MyFilesViewController: UIDocumentPickerDelegate {
         // These "Tasks" are ways for udapting the UI about the encryption status
         
         // Wrapper for the task
-        var wrapper = VaultFileWrapper()
+        let wrapper = VaultFileWrapper()
         wrapper.file = vaultFile
         wrapper.obs = MutableObservable<Float>(0)
         wrapper.task = TaskName.Encrypt
@@ -130,18 +132,12 @@ extension MyFilesViewController: UIDocumentPickerDelegate {
             vaultFile.iv = base64String
             vaultFile.isInSync = false
             
-            if isAuthenticated {
-                DispatchQueue.main.async {
-                    
-                    vaultFile.isInSync = true
-                    wrapper.file = vaultFile
-                    wrapper.obs = MutableObservable<Float>(0)
-                    wrapper.task = TaskName.Upload
-                        
-                    // Add to tasks list
-                    self.tasks[wrapper.file!.id!] = wrapper
-                    self.vaultFileRepository.saveVaultFile(vaultFile: vaultFile)
-                    self.networkFileHandler.requestFileUpload(vaultFile: vaultFile, fileURL: vaultFile.path!, wrapper: wrapper)
+            DispatchQueue.main.async {
+                self.vaultFileRepository.saveVaultFile(vaultFile: vaultFile)
+                
+                if isAuthenticated {
+                    self.prepareFileUpload(vaultFile)
+                    self.tableView.reloadData()
                 }
             }
         }

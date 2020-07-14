@@ -114,15 +114,20 @@ class NetworkFileHandler {
         }
         
         AF.download(baseURL + fileID, headers: headers, to: destination)
-        .downloadProgress { progress in
+            .downloadProgress { progress in
             wrapper?.obs?.wrappedValue = Float(progress.fractionCompleted)
             
         }.response { response in
-            print(response)
+            // In case of error attempt do download it later
+            if response.error != nil {
+                // Works bc a class is passed by ref
+                wrapper?.remove = true
+                wrapper?.obs?.wrappedValue = 1
+            }
         }
     }
     
-    func requestFileUpload(vaultFile: VaultFile, fileURL: URL, wrapper: VaultFileWrapper? = nil) {
+    func requestFileUpload(vaultFile: VaultFile, wrapper: VaultFileWrapper) {
         
         let token = self.appDelegate.cryptoHelper.getTokenOnKeyChain()
         
@@ -142,22 +147,6 @@ class NetworkFileHandler {
             let fileExtensionEnc = try encryptor.encrypt([UInt8](vaultFile.fileExtension!.utf8))
             let keyEnc = try encryptor.encrypt([UInt8](vaultFile.key!.utf8))
             
-            print("Enc: \(fileNameEnc)")
-            print("Original Base64: \(vaultFile.name!.toBase64())")
-            print("Enc Base64: \(fileNameEnc.toBase64())")
-            
-            // Original
-            /*
-            let uploadFileRequest = FileUploadRequest(
-                    fileClientId: vaultFile.id!.uuidString,
-                    name: vaultFile.name!,
-                    fileExtension: vaultFile.fileExtension!,
-                    size: vaultFile.size,
-                    iv: vaultFile.iv!,
-                    key: vaultFile.key!
-            )*/
-            
-            
             let uploadFileRequest = FileUploadRequest(
                     fileClientId: vaultFile.id!.uuidString,
                     name: fileNameEnc.toBase64()!,
@@ -166,8 +155,6 @@ class NetworkFileHandler {
                     iv: vaultFile.iv!,
                     key: keyEnc.toBase64()!
             )
-                
-                
                 
             self.fileID = vaultFile.id!.uuidString.replacingOccurrences(of: "-", with: "")
                 
@@ -182,7 +169,7 @@ class NetworkFileHandler {
                 parameters: uploadFileRequest,
                 encoder: JSONParameterEncoder.default,
                 headers: headers
-            ).response { response in self.handleFileRequest(response: response, url: fileURL, wrapper: wrapper)}
+            ).response { response in self.handleFileRequest(response: response, wrapper: wrapper)}
             
         } catch {
             print("Error: \(error)")
@@ -190,7 +177,7 @@ class NetworkFileHandler {
         }
     }
     
-    private func handleFileRequest(response: AFDataResponse<Data?>, url: URL, wrapper: VaultFileWrapper?) {
+    private func handleFileRequest(response: AFDataResponse<Data?>, wrapper: VaultFileWrapper) {
         
         if response.data == nil || response.error != nil {
             if response.error != nil {
@@ -200,11 +187,11 @@ class NetworkFileHandler {
         }
         
         let fileServerID = String(data: response.data!, encoding: .utf8)
-        self.uploadFile(fileServerID: fileServerID!, fileURL: url, wrapper: wrapper)
+        self.uploadFile(fileServerID: fileServerID!, wrapper: wrapper)
         
     }
     
-    private func uploadFile(fileServerID: String, fileURL: URL, wrapper: VaultFileWrapper?) {
+    private func uploadFile(fileServerID: String, wrapper: VaultFileWrapper) {
         
         let token = self.appDelegate.cryptoHelper.getTokenOnKeyChain()
         
@@ -216,13 +203,26 @@ class NetworkFileHandler {
         ]
         
         let url =  baseURL + fileServerID + "/upload"
-                
+        
         AF.upload(multipartFormData: { multiForm in
-            multiForm.append(fileURL, withName: "file")
+            multiForm.append(wrapper.file!.path!, withName: "file")
         }, to: url, headers: headers)
         .uploadProgress { progress in
-            wrapper?.obs?.wrappedValue = Float(progress.fractionCompleted)
+            wrapper.obs?.wrappedValue = Float(progress.fractionCompleted)
         }
-        .response { response in }
+        .response { response in
+            // in case of error then attempt to sync another time
+            if response.error != nil {
+                print("Error: \(response.error!)")
+                wrapper.obs?.wrappedValue = 1
+                wrapper.file?.isInSync = false
+            } else {
+                wrapper.file?.isInSync = true
+            }
+            
+            if wrapper.file != nil {
+                self.appDelegate.vaultFileRepository.saveVaultFile(vaultFile: wrapper.file!)
+            }
+        }
     }
 }

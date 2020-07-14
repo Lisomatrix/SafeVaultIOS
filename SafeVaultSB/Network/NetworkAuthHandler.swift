@@ -58,7 +58,7 @@ class NetworkAuthHandler {
             method: .post,
             parameters: authRequest,
             encoder: JSONParameterEncoder.default
-        ).response { response in self.handleTokenResponse(response)}
+            ).response { response in self.handleTokenResponse(response)}
     }
     
     // Func to handle repeated code when receiving token
